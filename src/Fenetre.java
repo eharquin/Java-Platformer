@@ -1,5 +1,6 @@
 import javax.swing.*;
 
+@SuppressWarnings("serial")
 public class Fenetre extends JFrame {
 
 	public Fenetre(){

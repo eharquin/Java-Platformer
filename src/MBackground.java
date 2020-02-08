@@ -4,7 +4,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import java.awt.geom.*;
 
-public class MBackground {
+public class MBackground implements MGameObject{
 
 	public static final int X_VELOCITY = 10;
 	public static final int Y_VELOCITY = 10;
@@ -26,6 +26,7 @@ public class MBackground {
 		this.width = MoteurJeu.MAP_WIDTH;
 	}
 
+	@Override
 	public void move(){
         if (this.v_x < 0 && this.pos_x + this.width > MoteurJeu.FRAME_WIDTH){ 
             this.pos_x += this.v_x;

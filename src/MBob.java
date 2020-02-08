@@ -4,7 +4,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import java.awt.geom.*;
 
-public class MBob {
+public class MBob implements MGameObject{
 
 	public static final int X_VELOCITY = 10;
 	public static final int Y_VELOCITY = 10;
@@ -27,8 +27,8 @@ public class MBob {
 
 	private int direction;
 
-	private boolean isFloating;
-	private boolean isJumpEnd;
+	private boolean floating;
+	private boolean jumpEnd;
 
 	private BufferedImage img;
 	private int imgDirection;
@@ -58,7 +58,7 @@ public class MBob {
 
 		this.loadImage();
 
-        this.img = this.idle[0];
+        this.img = MBob.idle[0];
 
         this.direction = EAST;
         this.imgDirection = EAST;
@@ -67,55 +67,28 @@ public class MBob {
         this.platform = platform0;
 	}
 
+	@Override
 	public void move(){
-		if(!this.isFloating && v_y != 0){
-        	this.isFloating = true;
-        	this.startJump = pos_y-MoteurJeu.MAP_HEIGHT;
-
-        }
  		
- 		if (this.v_x > 0 && !(this.getRightBounds().intersects(this.platform.getLeftBounds()))){
+ 		if (this.v_x > 0){
         	if( (pos_x+width/2 <= MoteurJeu.FRAME_WIDTH/2 || this.background.getX()+this.background.getWidth() == MoteurJeu.FRAME_WIDTH) && this.pos_x + this.width < MoteurJeu.FRAME_WIDTH){
         		this.pos_x += this.v_x; 
         	}
         }
 
-		if (this.v_x < 0 && !(this.getLeftBounds().intersects(this.platform.getRightBounds()))){
-			if(pos_x+width/2 >= MoteurJeu.FRAME_WIDTH/2 || this.background.getX() == 0){
-				if(this.pos_x > 0){
-		        	this.pos_x += this.v_x;
-		        }
+		if (this.v_x < 0){
+			if(pos_x+width/2 >= MoteurJeu.FRAME_WIDTH/2 || this.background.getX() == 0 && this.pos_x > 0){
+		        this.pos_x += this.v_x;
 		    }
-        }
-
-        if (this.isFloating) {
-            if (!this.isJumpEnd) this.pos_y += this.v_y;
-            else{
-            	this.pos_y -= this.v_y;
-            }
-        }
-
-        if (this.pos_y <= this.MAX_JUMP+this.startJump || this.getTopBounds().intersects(this.platform.getTopBounds())) this.isJumpEnd = true;
-
-        if ( (this.isFloating && this.pos_y == MoteurJeu.MAP_HEIGHT) || this.getBottomBounds().intersects(this.platform.getBounds())) {
-        	this.isFloating = false;
-            this.isJumpEnd = false;
-            this.v_y = 0;
-        }
-
-        if ( !this.isFloating && pos_y != MoteurJeu.MAP_HEIGHT && !this.getBottomBounds().intersects(this.platform.getBounds())) {
-        	this.isFloating = true;
-            this.isJumpEnd = true;
-            this.v_y = -Y_VELOCITY;
         }
         
         if(this.v_x == 0 && this.v_y == 0){
         	img = idle[(this.actualIdle++)%idle.length];
         }
-        else if(this.isJumpEnd){
+        else if(this.jumpEnd){
         	img = jump[14];
         }
-        else if(this.isFloating){
+        else if(this.floating){
         	img = jump[jump.length-1];
         }
         else{
@@ -162,6 +135,10 @@ public class MBob {
 		return this.direction;
 	}
 
+	public int getStartJump(){
+		return this.startJump;
+	}
+
 	public BufferedImage getImage(){
 		return this.img;
 	}
@@ -184,6 +161,14 @@ public class MBob {
 
 	public Rectangle getBottomBounds() {
     	return new Rectangle(pos_x, pos_y, width, 1);
+	}
+
+	public boolean isJumpEnd(){
+		return this.jumpEnd;
+	}
+
+	public boolean isFloating(){
+		return this.floating;
 	}
 
 
@@ -215,43 +200,55 @@ public class MBob {
 		this.direction = direction0;
 	}
 
+	public void setStartJump(int startJump0){
+		this.startJump = startJump0;
+	}
+
+	public void setJumpEnd(boolean jumpEnd0){
+		this.jumpEnd = jumpEnd0;
+	}
+
+	public void setFloating(boolean floating0){
+		this.floating = floating0;
+	}
+
 	private void loadImage(){
 		try{
 			File src;
 
 			src = new File("./img/walk");
 			File[] walkFile = src.listFiles();
-			this.walk = new BufferedImage[walkFile.length];
+			MBob.walk = new BufferedImage[walkFile.length];
 			for(int i = 0; i < walkFile.length; i++){
-				this.walk[i] = ImageIO.read(walkFile[i]);
+				MBob.walk[i] = ImageIO.read(walkFile[i]);
 			}
 
 			src = new File("./img/idle");
 			File[] idleFile = src.listFiles();
-			this.idle = new BufferedImage[idleFile.length];
+			MBob.idle = new BufferedImage[idleFile.length];
 			for(int i = 0; i < idleFile.length; i++){
-				this.idle[i] = ImageIO.read(idleFile[i]);
+				MBob.idle[i] = ImageIO.read(idleFile[i]);
 			}
 
 			src = new File("./img/jump");
 			File[] jumpFile = src.listFiles();
-			this.jump = new BufferedImage[jumpFile.length];
+			MBob.jump = new BufferedImage[jumpFile.length];
 			for(int i = 0; i < jumpFile.length; i++){
-				this.jump[i] = ImageIO.read(jumpFile[i]);
+				MBob.jump[i] = ImageIO.read(jumpFile[i]);
 			}
 
 			src = new File("./img/run");
 			File[] runFile = src.listFiles();
-			this.run = new BufferedImage[runFile.length];
+			MBob.run = new BufferedImage[runFile.length];
 			for(int i = 0; i < runFile.length; i++){
-				this.run[i] = ImageIO.read(runFile[i]);
+				MBob.run[i] = ImageIO.read(runFile[i]);
 			}
 
 			src = new File("./img/dead");
 			File[] deadFile = src.listFiles();
-			this.dead = new BufferedImage[deadFile.length];
+			MBob.dead = new BufferedImage[deadFile.length];
 			for(int i = 0; i < deadFile.length; i++){
-				this.dead[i] = ImageIO.read(deadFile[i]);
+				MBob.dead[i] = ImageIO.read(deadFile[i]);
 			}
 		}
 		catch (IOException e) {

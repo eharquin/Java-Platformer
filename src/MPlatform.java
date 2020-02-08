@@ -4,7 +4,7 @@ import java.awt.image.*;
 import javax.imageio.*;
 import java.awt.geom.*;
 
-public class MPlatform {
+public class MPlatform implements MGameObject{
 
 	public static final int X_VELOCITY = 10;
 	public static final int Y_VELOCITY = 10;
@@ -21,7 +21,7 @@ public class MPlatform {
 	private int v_y;
 
 	public MPlatform(MBackground background0){
-		this.pos_x = 1000;
+		this.pos_x = 250;
 		this.pos_y = 450;
 
 		this.height = 20;
@@ -30,12 +30,13 @@ public class MPlatform {
 		this.background = background0;
 	}
 
+	@Override
 	public void move(){
         if (this.v_x < 0 && !(this.background.getX()+this.background.getWidth() == MoteurJeu.FRAME_WIDTH) ){ 
             this.pos_x += this.v_x;
         }
         
-        if (this.v_x > 0 && !(this.background.getX() == 0 && this.pos_x > 0) ){ 
+        if (this.v_x > 0 && !(this.background.getX() == 0) ){ 
             this.pos_x += this.v_x;
         }
 	}

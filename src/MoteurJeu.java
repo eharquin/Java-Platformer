@@ -62,6 +62,45 @@ public class MoteurJeu extends Observable {
 	}
 
 	public void tick(){
+
+		if(!this.bob.isFloating() && this.bob.getVelocityY() < 0){
+        	this.bob.setFloating(true);
+        	this.bob.setStartJump(this.bob.getY() - MoteurJeu.MAP_HEIGHT);
+        }
+
+        System.out.println(this.bob.isFloating());
+		System.out.println(this.bob.getVelocityY());
+
+		if (this.bob.getVelocityX() > 0 && this.bob.getRightBounds().intersects(this.platform.getLeftBounds()) ) {
+			this.bob.setVelocityX(0);
+		}
+
+		if (this.bob.getVelocityX() < 0 && this.bob.getLeftBounds().intersects(this.platform.getRightBounds()) ) {
+			this.bob.setVelocityX(0);
+		}
+
+		if(this.bob.isFloating()){
+            if (!this.bob.isJumpEnd()) this.bob.setY(this.bob.getY() - MBob.Y_VELOCITY);
+            else{
+            	this.bob.setY(this.bob.getY() + MBob.Y_VELOCITY);
+            }
+        }
+
+		if(this.bob.getY() <= MBob.MAX_JUMP+this.bob.getStartJump() || this.bob.getTopBounds().intersects(this.platform.getTopBounds())){
+			this.bob.setJumpEnd(true);
+		}
+
+		if(this.bob.isFloating() && this.bob.getY() == MoteurJeu.MAP_HEIGHT || this.bob.getBottomBounds().intersects(this.platform.getBounds())){
+			this.bob.setFloating(false);
+            this.bob.setJumpEnd(false);
+            this.bob.setVelocityY(0);
+		}
+
+		if (!this.bob.isFloating() && this.bob.getY() != MoteurJeu.MAP_HEIGHT && !this.bob.getBottomBounds().intersects(this.platform.getBounds())){
+			this.bob.setFloating(true);
+            this.bob.setJumpEnd(true);
+            this.bob.setVelocityY(-MBob.Y_VELOCITY);
+        }
 		
 		this.bob.move();
 

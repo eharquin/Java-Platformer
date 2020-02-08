@@ -2,25 +2,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
+@SuppressWarnings("serial")
 public class Rendu extends JComponent implements Observer {
 
 	private MoteurJeu donnee;
 
-	private Background background;
+	private VBackground background;
 
-	private Platform platform;
+	private VPlatform platform;
 
-	private Bob vBob;
+	private VBob vBob;
 
 	public Rendu(){
 		MBackground mBackground = new MBackground();
-		this.background = new Background(mBackground);
+		this.background = new VBackground(mBackground);
 
 		MPlatform mPlatform = new MPlatform(mBackground);
-		this.platform = new Platform(mPlatform);
+		this.platform = new VPlatform(mPlatform);
 
 		MBob mBob = new MBob(mBackground, mPlatform);
-		this.vBob = new Bob(mBob);
+		this.vBob = new VBob(mBob);
 
 		this.donnee = new MoteurJeu(mBob, mBackground, mPlatform);
 		this.donnee.addObserver(this);
@@ -38,19 +39,19 @@ public class Rendu extends JComponent implements Observer {
    	}
 
 	@Override
-	protected void paintComponent(Graphics pinceau) {
-		Graphics2D secondPinceau = (Graphics2D) pinceau.create();
-		secondPinceau.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	protected void paintComponent(Graphics pencil0) {
+		Graphics2D pencil = (Graphics2D) pencil0.create();
+		pencil.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
 		if (this.isOpaque()) {
-		  secondPinceau.setColor(this.getBackground());
-		  secondPinceau.fillRect(0, 0, this.getWidth(), this.getHeight());
+		  pencil.setColor(this.getBackground());
+		  pencil.fillRect(0, 0, this.getWidth(), this.getHeight());
 		}
 
-		this.background.draw(secondPinceau);
+		this.background.draw(pencil);
 
-		this.platform.draw(secondPinceau);
+		this.platform.draw(pencil);
 
-		this.vBob.draw(secondPinceau);	
+		this.vBob.draw(pencil);	
 	}
 }
