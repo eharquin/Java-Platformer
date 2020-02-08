@@ -17,10 +17,10 @@ public class Rendu extends JComponent implements Observer {
 		MBackground mBackground = new MBackground();
 		this.background = new VBackground(mBackground);
 
-		MPlatform mPlatform = new MPlatform(mBackground);
+		MPlatform mPlatform = new MPlatform();
 		this.platform = new VPlatform(mPlatform);
 
-		MBob mBob = new MBob(mBackground, mPlatform);
+		MBob mBob = new MBob();
 		this.vBob = new VBob(mBob);
 
 		this.donnee = new MoteurJeu(mBob, mBackground, mPlatform);

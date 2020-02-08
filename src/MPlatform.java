@@ -20,25 +20,17 @@ public class MPlatform implements MGameObject{
 	private int v_x;
 	private int v_y;
 
-	public MPlatform(MBackground background0){
+	public MPlatform(){
 		this.pos_x = 250;
 		this.pos_y = 450;
 
 		this.height = 20;
 		this.width = 300;
-
-		this.background = background0;
 	}
 
 	@Override
 	public void move(){
-        if (this.v_x < 0 && !(this.background.getX()+this.background.getWidth() == MoteurJeu.FRAME_WIDTH) ){ 
-            this.pos_x += this.v_x;
-        }
-        
-        if (this.v_x > 0 && !(this.background.getX() == 0) ){ 
-            this.pos_x += this.v_x;
-        }
+
 	}
 
 	public int getX(){
@@ -70,15 +62,19 @@ public class MPlatform implements MGameObject{
 	}
 
 	public Rectangle getLeftBounds(){
-		return new Rectangle(pos_x-10, pos_y, 20, height);
+		return new Rectangle(pos_x, pos_y,1 , height);
 	}
 
 	public Rectangle getRightBounds(){
-		return new Rectangle(pos_x+width-10, pos_y, 20, height);
+		return new Rectangle(pos_x+width-1, pos_y, 1, height);
 	}
 
 	public Rectangle getTopBounds(){
 		return new Rectangle(pos_x, pos_y, width, 1);
+	}
+
+	public Rectangle getBottomBounds(){
+		return new Rectangle(pos_x, pos_y+height-1, width, 1);
 	}
 
 	public void setX(int x0){

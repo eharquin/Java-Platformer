@@ -19,5 +19,9 @@ public class VBob implements VGameObject{
 		pencil.drawRect(this.bob.getLeftBounds().x,this.bob.getLeftBounds().y,this.bob.getLeftBounds().width,this.bob.getLeftBounds().height);
 		pencil.setColor(Color.GREEN);
 		pencil.drawRect(this.bob.getRightBounds().x,this.bob.getRightBounds().y,this.bob.getRightBounds().width,this.bob.getRightBounds().height);
+		pencil.setColor(Color.MAGENTA);
+		pencil.drawRect(this.bob.getTopBounds().x,this.bob.getTopBounds().y,this.bob.getTopBounds().width,this.bob.getTopBounds().height);
+		pencil.setColor(Color.MAGENTA);
+		pencil.drawRect(this.bob.getBottomBounds().x,this.bob.getBottomBounds().y,this.bob.getBottomBounds().width,this.bob.getBottomBounds().height);
 	}
 }

@@ -15,7 +15,7 @@ public class VBackground implements VGameObject{
 
 		pencil.setColor(Color.BLACK);
 		for(int i=0; i<20; i++){
-			pencil.fillRect(this.background.getX()+2*i*50, 200, 50, 50);
+			pencil.fillRect(this.background.getX()+2*i*50, 400, 50, 50);
 		}
 	}
 }

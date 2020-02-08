@@ -28,11 +28,11 @@ public class MBackground implements MGameObject{
 
 	@Override
 	public void move(){
-        if (this.v_x < 0 && this.pos_x + this.width > MoteurJeu.FRAME_WIDTH){ 
+        if (this.v_x < 0 && !(this.pos_x + this.width == MoteurJeu.FRAME_WIDTH) ){ 
             this.pos_x += this.v_x;
         }
         
-        if (this.v_x > 0 && this.pos_x < 0){ 
+        if (this.v_x > 0 && !(this.pos_x == 0) ){ 
             this.pos_x += this.v_x;
         }
 	}

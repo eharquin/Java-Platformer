@@ -42,14 +42,17 @@ public class MBob implements MGameObject{
 	private static BufferedImage[] run;
 	private static BufferedImage[] dead;
 
-	private MBackground background;
-
-	private MPlatform platform;
-
-
 	private int startJump;
 
-	public MBob(MBackground background0, MPlatform platform0){
+	private void isRightCollision;
+
+	private void isLeftCollision;
+
+	private void isTopCollision;
+
+	private void isBottomCollision;
+
+	public MBob(){
 		this.pos_x = 0;
 		this.pos_y = MoteurJeu.MAP_HEIGHT;
 
@@ -62,26 +65,26 @@ public class MBob implements MGameObject{
 
         this.direction = EAST;
         this.imgDirection = EAST;
-
-        this.background = background0;
-        this.platform = platform0;
 	}
 
 	@Override
 	public void move(){
- 		
- 		if (this.v_x > 0){
-        	if( (pos_x+width/2 <= MoteurJeu.FRAME_WIDTH/2 || this.background.getX()+this.background.getWidth() == MoteurJeu.FRAME_WIDTH) && this.pos_x + this.width < MoteurJeu.FRAME_WIDTH){
-        		this.pos_x += this.v_x; 
-        	}
+
+		// make bob floating
+		if(!this.bob.isFloating() && this.bob.getVelocityY() < 0){
+        	this.bob.setFloating(true);
+        	this.bob.setStartJump(this.bob.getY() - MoteurJeu.MAP_HEIGHT);
         }
 
-		if (this.v_x < 0){
-			if(pos_x+width/2 >= MoteurJeu.FRAME_WIDTH/2 || this.background.getX() == 0 && this.pos_x > 0){
-		        this.pos_x += this.v_x;
-		    }
-        }
-        
+        // test the right collisions of bob
+		if (this.bob.getVelocityX() > 0 && this.isRightCollision ) {
+			this.bob.setVelocityX(0);
+		}
+
+
+
+
+        // set the right image
         if(this.v_x == 0 && this.v_y == 0){
         	img = idle[(this.actualIdle++)%idle.length];
         }
@@ -148,19 +151,19 @@ public class MBob implements MGameObject{
 	}
 
 	public Rectangle getRightBounds() {
-    	return new Rectangle(pos_x+width-10, pos_y-height, 20, height);
+    	return new Rectangle(pos_x+width-10, pos_y-height-10, 20, height+20);
 	}
 
 	public Rectangle getLeftBounds() {
-    	return new Rectangle(pos_x-10, pos_y-height, 20, height);
+    	return new Rectangle(pos_x-10, pos_y-height-10, 20, height+20);
 	}
 
 	public Rectangle getTopBounds() {
-    	return new Rectangle(pos_x, pos_y-height, width, 1);
+    	return new Rectangle(pos_x, pos_y-height-10, width, 20);
 	}
 
 	public Rectangle getBottomBounds() {
-    	return new Rectangle(pos_x, pos_y, width, 1);
+    	return new Rectangle(pos_x, pos_y-10, width, 20);
 	}
 
 	public boolean isJumpEnd(){
