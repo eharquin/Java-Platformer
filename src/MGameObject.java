@@ -1,5 +1,5 @@
 public interface MGameObject {
-
-	public void move();
+	
+	public abstract void move();
 
 }

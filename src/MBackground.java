@@ -18,17 +18,22 @@ public class MBackground implements MGameObject{
 	private int v_x;
 	private int v_y;
 
+	private static BufferedImage[] parralax;
+
+
 	public MBackground(){
 		this.pos_x = 0;
-		this.pos_y = MoteurJeu.MAP_WIDTH;
+		this.pos_y = GameEngine.MAP_HEIGHT;
 
-		this.height = MoteurJeu.MAP_HEIGHT;
-		this.width = MoteurJeu.MAP_WIDTH;
+		this.height = GameEngine.MAP_HEIGHT;
+		this.width = GameEngine.MAP_WIDTH;
+
+		this.loadImage();
 	}
 
 	@Override
 	public void move(){
-        if (this.v_x < 0 && !(this.pos_x + this.width == MoteurJeu.FRAME_WIDTH) ){ 
+        if (this.v_x < 0 && !(this.pos_x + this.width == GameEngine.FRAME_WIDTH) ){ 
             this.pos_x += this.v_x;
         }
         
@@ -61,6 +66,10 @@ public class MBackground implements MGameObject{
 		return this.v_y;
 	}
 
+	public BufferedImage[] getImages(){
+		return this.parralax;
+	}
+
 
 	public void setX(int x0){
 		this.pos_x = x0;
@@ -85,4 +94,20 @@ public class MBackground implements MGameObject{
 	public void setVelocityY(int vy0){
 		this.v_y = vy0;
 	}
+
+	private void loadImage(){
+		try{
+			File src;
+
+			src = new File("./img/parralax");
+			File[] parralaxFile = src.listFiles();
+			MBackground.parralax = new BufferedImage[parralaxFile.length];
+			for(int i = 0; i < parralaxFile.length; i++){
+				MBackground.parralax[i] = ImageIO.read(parralaxFile[i]);
+			}
+		}
+		catch (IOException e) {
+            System.out.println("Background images: " + e.getMessage());
+        }
+    }
 }

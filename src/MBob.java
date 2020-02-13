@@ -7,7 +7,7 @@ import java.awt.geom.*;
 public class MBob implements MGameObject{
 
 	public static final int X_VELOCITY = 10;
-	public static final int Y_VELOCITY = 10;
+	public static final int Y_VELOCITY = 12;
 
 	public static final int MAX_JUMP = 400;
 
@@ -40,69 +40,108 @@ public class MBob implements MGameObject{
 	private static BufferedImage[] jump;
 	private int actualJump;
 	private static BufferedImage[] run;
+	private int actualDead;
 	private static BufferedImage[] dead;
 
 	private int startJump;
 
-	private void isRightCollision;
+	private boolean rightCollision;
+	private boolean leftCollision;
+	private boolean topCollision;
+	private boolean bottomCollision;
 
-	private void isLeftCollision;
+	private boolean mapEnd;
+	private boolean mapStart;
 
-	private void isTopCollision;
+	private boolean collisionVisible;
 
-	private void isBottomCollision;
-
-	public MBob(){
+	public MBob(boolean collisionVisible0){
 		this.pos_x = 0;
-		this.pos_y = MoteurJeu.MAP_HEIGHT;
+		this.pos_y = GameEngine.MAP_HEIGHT;
 
-		this.height = 200;
-		this.width = 182;
-
-		this.loadImage();
+		this.loadImage("boy");
 
         this.img = MBob.idle[0];
 
+        this.height = this.img.getHeight()/3;
+		this.width = this.img.getWidth()/3;
+
         this.direction = EAST;
         this.imgDirection = EAST;
+
+        this.collisionVisible = collisionVisible0;
 	}
 
 	@Override
 	public void move(){
 
+		System.out.println(v_y);
+
+
 		// make bob floating
-		if(!this.bob.isFloating() && this.bob.getVelocityY() < 0){
-        	this.bob.setFloating(true);
-        	this.bob.setStartJump(this.bob.getY() - MoteurJeu.MAP_HEIGHT);
+		if(!this.floating && this.v_y < 0){
+        	this.floating = true;
+        	this.startJump = this.pos_y - GameEngine.MAP_HEIGHT;
         }
 
-        // test the right collisions of bob
-		if (this.bob.getVelocityX() > 0 && this.isRightCollision ) {
-			this.bob.setVelocityX(0);
+        // make bob go to right
+		if (this.v_x > 0 && !this.rightCollision && (this.pos_x + this.width/2 <= GameEngine.FRAME_WIDTH/2 || this.mapEnd) && this.pos_x + this.width < GameEngine.FRAME_WIDTH) {
+			this.pos_x	+= this.v_x;
 		}
 
+		// make bob go to left
+		if (this.v_x < 0 && !this.leftCollision && (this.pos_x + this.width/2 >= GameEngine.FRAME_WIDTH/2 || this.mapStart) && this.pos_x > 0){
+		    this.pos_x	+= this.v_x;
+        }
 
+        // make bob go up or down
+        if(this.floating){
+            if (!this.jumpEnd) this.v_y = -MBob.Y_VELOCITY;
+            else this.v_y = MBob.Y_VELOCITY;
+            this.pos_y += this.v_y;
+        }
+
+        // stop bob jump
+        if(this.pos_y <= MBob.MAX_JUMP + this.startJump || this.topCollision)
+			this.jumpEnd = true;
+
+		// make bob landing
+		if(this.v_y > 0 && ((this.floating && this.pos_y == GameEngine.MAP_HEIGHT) || this.bottomCollision)){
+			this.floating = false;
+            this.jumpEnd = false;
+            this.v_y = 0;
+		}
+
+		// knocks bob off a platform
+		if (!this.floating && this.pos_y != GameEngine.MAP_HEIGHT && !this.bottomCollision){
+			this.floating = true;
+            this.jumpEnd = true;
+            this.v_y = -MBob.Y_VELOCITY;
+        }
 
 
         // set the right image
         if(this.v_x == 0 && this.v_y == 0){
-        	img = idle[(this.actualIdle++)%idle.length];
+        	this.img = MBob.idle[(this.actualIdle++) % MBob.idle.length];
         }
         else if(this.jumpEnd){
-        	img = jump[14];
+        	this.img = MBob.jump[MBob.jump.length-1];
         }
         else if(this.floating){
-        	img = jump[jump.length-1];
+        	this.img = MBob.jump[MBob.jump.length-1];
         }
         else{
-        	img = walk[(this.actualWalk++)%walk.length];
+        	this.img = MBob.walk[(this.actualWalk++) % MBob.walk.length];
         }
 
         this.rotateImage(this.direction);
+
+        this.height = this.img.getHeight()/3;
+		this.width = this.img.getWidth()/3;
 	}
 
-	public void rotateImage(int direction){
-		if(direction != imgDirection){
+	private void rotateImage(int direction){
+		if(this.direction != this.imgDirection){
 			AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
 	    	tx.translate(-this.img.getWidth(null), 0);
 	    	AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
@@ -147,23 +186,23 @@ public class MBob implements MGameObject{
 	}
 
 	public Rectangle getBounds() {
-    	return new Rectangle(pos_x, pos_y-height, width, height);
+    	return new Rectangle(this.pos_x, this.pos_y-this.height, this.width, this.height);
 	}
 
 	public Rectangle getRightBounds() {
-    	return new Rectangle(pos_x+width-10, pos_y-height-10, 20, height+20);
+    	return new Rectangle(this.pos_x + this.width, this.pos_y - this.height, 12, this.height);
 	}
 
 	public Rectangle getLeftBounds() {
-    	return new Rectangle(pos_x-10, pos_y-height-10, 20, height+20);
+    	return new Rectangle(this.pos_x - 12, this.pos_y - this.height, 12, this.height);
 	}
 
 	public Rectangle getTopBounds() {
-    	return new Rectangle(pos_x, pos_y-height-10, width, 20);
+    	return new Rectangle(this.pos_x, this.pos_y - this.height - 12, this.width, 12);
 	}
 
 	public Rectangle getBottomBounds() {
-    	return new Rectangle(pos_x, pos_y-10, width, 20);
+    	return new Rectangle(this.pos_x, this.pos_y, this.width, 12);
 	}
 
 	public boolean isJumpEnd(){
@@ -172,6 +211,26 @@ public class MBob implements MGameObject{
 
 	public boolean isFloating(){
 		return this.floating;
+	}
+
+	public boolean isRightCollision(){
+		return this.rightCollision;
+	}
+
+	public boolean isLeftCollision(){
+		return this.leftCollision;
+	}
+
+	public boolean isTopCollision(){
+		return this.topCollision;
+	}
+
+	public boolean isBottomCollision(){
+		return this.bottomCollision;
+	}
+
+	public boolean isCollisionVisible(){
+		return this.collisionVisible;
 	}
 
 
@@ -215,47 +274,107 @@ public class MBob implements MGameObject{
 		this.floating = floating0;
 	}
 
-	private void loadImage(){
+	public void setRightCollision(boolean rightCollision0){
+		this.rightCollision = rightCollision0;
+	}
+
+	public void setLeftCollision(boolean leftCollision0){
+		this.leftCollision = leftCollision0;
+	}
+
+	public void setTopCollision(boolean topCollision0){
+		this.topCollision = topCollision0;
+	}
+
+	public void setBottomCollision(boolean bottomCollision0){
+		this.bottomCollision = bottomCollision0;
+	}
+
+	public void setMapEnd(boolean mapEnd0){
+		this.mapEnd = mapEnd0;
+	}
+
+	public void setMapStart(boolean mapStart0){
+		this.mapStart = mapStart0;
+	}
+
+	// load bob images
+	private void loadImage(String character){
 		try{
 			File src;
 
-			src = new File("./img/walk");
+			src = new File("./img/"+character+"/walk");
 			File[] walkFile = src.listFiles();
 			MBob.walk = new BufferedImage[walkFile.length];
 			for(int i = 0; i < walkFile.length; i++){
-				MBob.walk[i] = ImageIO.read(walkFile[i]);
+				MBob.walk[i] = trim(ImageIO.read(walkFile[i]));
 			}
 
-			src = new File("./img/idle");
+			src = new File("./img/"+character+"/idle");
 			File[] idleFile = src.listFiles();
 			MBob.idle = new BufferedImage[idleFile.length];
 			for(int i = 0; i < idleFile.length; i++){
-				MBob.idle[i] = ImageIO.read(idleFile[i]);
+				MBob.idle[i] = trim(ImageIO.read(idleFile[i]));
 			}
 
-			src = new File("./img/jump");
+			src = new File("./img/"+character+"/jump");
 			File[] jumpFile = src.listFiles();
 			MBob.jump = new BufferedImage[jumpFile.length];
 			for(int i = 0; i < jumpFile.length; i++){
-				MBob.jump[i] = ImageIO.read(jumpFile[i]);
+				MBob.jump[i] = trim(ImageIO.read(jumpFile[i]));
 			}
 
-			src = new File("./img/run");
+			src = new File("./img/"+character+"/run");
 			File[] runFile = src.listFiles();
 			MBob.run = new BufferedImage[runFile.length];
 			for(int i = 0; i < runFile.length; i++){
-				MBob.run[i] = ImageIO.read(runFile[i]);
+				MBob.run[i] = trim(ImageIO.read(runFile[i]));
 			}
 
-			src = new File("./img/dead");
+			src = new File("./img/"+character+"/dead");
 			File[] deadFile = src.listFiles();
 			MBob.dead = new BufferedImage[deadFile.length];
 			for(int i = 0; i < deadFile.length; i++){
-				MBob.dead[i] = ImageIO.read(deadFile[i]);
+				MBob.dead[i] = trim(ImageIO.read(deadFile[i]));
 			}
 		}
 		catch (IOException e) {
-            System.out.println("Walk sprite:" + e.getMessage());
+            System.out.println("Bob sprites: " + e.getMessage());
         }
+    }
+
+    // trim the image
+    private static BufferedImage trim(BufferedImage img) {
+	    int width = img.getWidth();
+	    int height = img.getHeight();
+
+	    int top = height / 2;
+	    int bottom = top;
+
+	    int left = width / 2 ;
+	    int right = left;
+
+	    for (int x = 0; x < width; x++) {
+	        for (int y = 0; y < height; y++) {
+	            if (isFg(img.getRGB(x, y))){
+
+	                top    = Math.min(top, y);
+	                bottom = Math.max(bottom, y);
+
+	                left   = Math.min(left, x);
+	                right  = Math.max(right, x);
+	            }
+	        }
+	    }
+	    return img.getSubimage(left, top, right - left, bottom - top);
+	}
+
+	private static boolean isFg(int v) {
+	    Color c = new Color(v);
+	    return(isColor((c.getRed() + c.getGreen() + c.getBlue())/2));
+	}
+
+	private static boolean isColor(int c) {
+	    return c > 0 && c < 255;
 	}
 }

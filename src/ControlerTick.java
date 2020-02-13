@@ -2,13 +2,13 @@ import java.util.*;
 
 public class ControlerTick extends TimerTask {
 
-	private MoteurJeu d;
+	private GameEngine d;
 
-	public ControlerTick(MoteurJeu d0){
+	public ControlerTick(GameEngine d0){
 		this.d = d0;
 
 		Timer timer = new Timer();
-        timer.schedule(this ,20, 20);
+        timer.schedule(this ,25, 25);
 	}
 
 	@Override

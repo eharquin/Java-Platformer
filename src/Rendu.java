@@ -5,11 +5,13 @@ import java.util.*;
 @SuppressWarnings("serial")
 public class Rendu extends JComponent implements Observer {
 
-	private MoteurJeu donnee;
+	private GameEngine gameEngine;
 
 	private VBackground background;
 
-	private VPlatform platform;
+	private VPlatform[] platforms;
+
+	private VEnemy[] enemies;
 
 	private VBob vBob;
 
@@ -17,21 +19,34 @@ public class Rendu extends JComponent implements Observer {
 		MBackground mBackground = new MBackground();
 		this.background = new VBackground(mBackground);
 
-		MPlatform mPlatform = new MPlatform();
-		this.platform = new VPlatform(mPlatform);
+		MPlatform mPlatform1 = new MPlatform(400,450,270,200, false);
+		VPlatform vPlatform1 = new VPlatform(mPlatform1);
 
-		MBob mBob = new MBob();
+		MPlatform mPlatform2 = new MPlatform(1300,450,270,200, false);
+		VPlatform vPlatform2 = new VPlatform(mPlatform2);
+
+		MPlatform mPlatform3 = new MPlatform(850,350,20,200, false);
+		VPlatform vPlatform3 = new VPlatform(mPlatform3);
+
+		MEnemy mEnemy1 = new MEnemy(2000, 720, true);
+		VEnemy vEnemy1 = new VEnemy(mEnemy1);
+
+		this.platforms = new VPlatform[] {vPlatform1, vPlatform2, vPlatform3};
+
+		this.enemies = new VEnemy[] {vEnemy1};
+
+		MBob mBob = new MBob(true);
 		this.vBob = new VBob(mBob);
 
-		this.donnee = new MoteurJeu(mBob, mBackground, mPlatform);
-		this.donnee.addObserver(this);
+		this.gameEngine = new GameEngine(mBob, mBackground, new MPlatform [] {mPlatform1, mPlatform2, mPlatform3}, new MEnemy[] {mEnemy1});
+		this.gameEngine.addObserver(this);
 
-		ControlerDirection control = new ControlerDirection(donnee);
+		ControlerDirection control = new ControlerDirection(this.gameEngine);
 		
 		this.setFocusable(true);
 		this.addKeyListener(control);
 
-		this.setPreferredSize(new Dimension(MoteurJeu.FRAME_WIDTH, MoteurJeu.FRAME_HEIGHT));
+		this.setPreferredSize(new Dimension(GameEngine.FRAME_WIDTH, GameEngine.FRAME_HEIGHT));
 	}
 
 	public void update(Observable obs, Object obj){
@@ -50,7 +65,12 @@ public class Rendu extends JComponent implements Observer {
 
 		this.background.draw(pencil);
 
-		this.platform.draw(pencil);
+		for(VPlatform platform : this.platforms){
+			platform.draw(pencil);
+		}
+		for(VEnemy enemy : this.enemies){
+			enemy.draw(pencil);
+		}
 
 		this.vBob.draw(pencil);	
 	}

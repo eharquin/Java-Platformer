@@ -8,9 +8,7 @@ public class MPlatform implements MGameObject{
 
 	public static final int X_VELOCITY = 10;
 	public static final int Y_VELOCITY = 10;
-
-	private MBackground background;
-
+	
 	private int pos_x;
 	private int pos_y;
 
@@ -20,17 +18,29 @@ public class MPlatform implements MGameObject{
 	private int v_x;
 	private int v_y;
 
-	public MPlatform(){
-		this.pos_x = 250;
-		this.pos_y = 450;
+	private boolean mapEnd;
+	private boolean mapStart;
 
-		this.height = 20;
-		this.width = 300;
+	private boolean collisionVisible;
+
+	public MPlatform(int pos_x0, int pos_y0, int height0, int width0, boolean collisionVisible0){
+		this.pos_x = pos_x0;
+		this.pos_y = pos_y0;
+
+		this.height = height0;
+		this.width = width0;
+
+		this.collisionVisible = collisionVisible0;
 	}
 
 	@Override
 	public void move(){
 
+		if(this.v_x < 0 && !this.mapEnd)
+        	this.pos_x += v_x;
+
+        if(this.v_x > 0 && !this.mapStart)
+        	this.pos_x += v_x;
 	}
 
 	public int getX(){
@@ -57,24 +67,28 @@ public class MPlatform implements MGameObject{
 		return this.v_y;
 	}
 
+	public boolean isCollisionVisible(){
+		return this.collisionVisible;
+	}
+
 	public Rectangle getBounds() {
-    	return new Rectangle(pos_x, pos_y, width, height);
+    	return new Rectangle(this.pos_x, this.pos_y, this.width, this.height);
 	}
 
 	public Rectangle getLeftBounds(){
-		return new Rectangle(pos_x, pos_y,1 , height);
+		return new Rectangle(this.pos_x, this.pos_y,1 , this.height);
 	}
 
 	public Rectangle getRightBounds(){
-		return new Rectangle(pos_x+width-1, pos_y, 1, height);
+		return new Rectangle(this.pos_x + this.width - 1, this.pos_y, 1, this.height);
 	}
 
 	public Rectangle getTopBounds(){
-		return new Rectangle(pos_x, pos_y, width, 1);
+		return new Rectangle(this.pos_x, this.pos_y, this.width, 1);
 	}
 
 	public Rectangle getBottomBounds(){
-		return new Rectangle(pos_x, pos_y+height-1, width, 1);
+		return new Rectangle(this.pos_x, this.pos_y + this.height-1, this.width, 1);
 	}
 
 	public void setX(int x0){
@@ -99,5 +113,13 @@ public class MPlatform implements MGameObject{
 
 	public void setVelocityY(int vy0){
 		this.v_y = vy0;
+	}
+
+	public void setMapEnd(boolean mapEnd0){
+		this.mapEnd = mapEnd0;
+	}
+
+	public void setMapStart(boolean mapStart0){
+		this.mapStart = mapStart0;
 	}
 }
